@@ -1,19 +1,20 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+module.exports = {
+  output: 'standalone',
+    // ★ Turbopack のワークスペース誤検知を防ぐ（今回の警告対策）
+  turbopack: {
+    root: __dirname, // プロジェクトのルートを明示
+  },
 
-const nextConfig = {
-  output: "export",
-  images: { unoptimized: true },
-
-  // ★ ESLint をビルド時は無視
+  // ★ ビルド時は ESLint を無視
   eslint: {
     ignoreDuringBuilds: true,
   },
 
-  // ★ TypeScript の型エラーもビルドは通す
+  // ★ 型エラーがあってもビルド続行
   typescript: {
     ignoreBuildErrors: true,
   },
-  basePath: "/webapp/CREW",
-  trailingSlash: true,
+  images: { unoptimized: true },
+  basePath: '/webapp/CREW',   // ← サブパスに合わせる
 };
-export default nextConfig;
