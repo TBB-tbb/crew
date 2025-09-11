@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
   },
 
   basePath: "/webapp/CREW",
+  assetPrefix: "/webapp/CREW",
 };
 
 export default nextConfig;
