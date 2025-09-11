@@ -16,11 +16,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // ← TSの型エラーでもビルド通す！
   },
-
-  basePath: "/webapp/CREW",
-  env: {
-    NEXT_PUBLIC_BASE_PATH: "/webapp/CREW",
-  },
 };
 
 export default nextConfig;
