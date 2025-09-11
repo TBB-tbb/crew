@@ -18,7 +18,9 @@ const nextConfig: NextConfig = {
   },
 
   basePath: "/webapp/CREW",
-  assetPrefix: "/webapp/CREW",
+  env: {
+    NEXT_PUBLIC_BASE_PATH: "/webapp/CREW",
+  },
 };
 
 export default nextConfig;

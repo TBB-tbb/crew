@@ -58,7 +58,7 @@ export default function KioskTop() {
       <div className="flex  items-center justify-between">
         <h1 className="text-2xl font-bold">
           <Image
-            src="/logo.svg" // public/logo.png
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logo.svg`}
             alt="CREWロゴ"
             width={200} // 横幅（調整してね）
             height={60} // 縦幅（調整してね）
