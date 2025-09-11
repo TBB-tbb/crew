@@ -364,7 +364,19 @@ export default function MemberStep() {
                 )
                 // ← ここで並び替えを追加
                 .sort((a, b) => {
-                  const priorityMembers = ["小川", "市瀬"]; // ★優先メンバーリスト
+                  const priorityMembers = [
+                    "小川",
+                    "桐生",
+                    "清水",
+                    "堀口",
+                    "松山",
+                    "菊池",
+                    "針生",
+                    "市瀬",
+                    "横田",
+                    "浅井",
+                    "大石",
+                  ]; // ★優先メンバーリスト
                   const ai = priorityMembers.includes(a.name) ? 0 : 1;
                   const bi = priorityMembers.includes(b.name) ? 0 : 1;
                   return ai - bi || a.name.localeCompare(b.name, "ja");
