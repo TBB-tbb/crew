@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // ← TSの型エラーでもビルド通す！
   },
+
+  basePath: "/webapp/CREW",
+  assetPrefix: "/webapp/CREW",
 };
 
 export default nextConfig;
