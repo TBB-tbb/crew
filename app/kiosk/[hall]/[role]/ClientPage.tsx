@@ -369,6 +369,7 @@ export default function MemberStep() {
                     "桐生",
                     "清水",
                     "堀口",
+                    "武藤",
                     "松山",
                     "菊池",
                     "針生",
