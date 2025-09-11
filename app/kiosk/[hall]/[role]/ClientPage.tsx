@@ -362,6 +362,13 @@ export default function MemberStep() {
                 .filter((m) =>
                   m.name.toLowerCase().includes(search.toLowerCase())
                 )
+                // ← ここで並び替えを追加
+                .sort((a, b) => {
+                  const priorityMembers = ["小川", "市瀬"]; // ★優先メンバーリスト
+                  const ai = priorityMembers.includes(a.name) ? 0 : 1;
+                  const bi = priorityMembers.includes(b.name) ? 0 : 1;
+                  return ai - bi || a.name.localeCompare(b.name, "ja");
+                })
                 .map((m) => {
                   const checked = includesByNormalized(selected, m.name);
                   return (
@@ -383,7 +390,7 @@ export default function MemberStep() {
                       >
                         {checked ? "✓" : ""}
                       </span>
-                      <span className="truncate text-base">{m.name}</span>
+                      {m.name}
                     </button>
                   );
                 })}
