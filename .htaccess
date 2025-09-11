@@ -1,6 +1,16 @@
+DirectoryIndex index.html
+Options -Indexes -MultiViews
+
 RewriteEngine On
-RewriteBase /crew/
-RewriteRule ^index\.html$ - [L]
+RewriteBase /webapp/CREW/
+
+# /kiosk → /kiosk.html のように拡張子補完（実ファイル/ディレクトリが無い場合のみ）
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /crew/index.html [L]
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.+)$ $1.html [L]
+
+# SPAフォールバック
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /webapp/CREW/index.html [L]
