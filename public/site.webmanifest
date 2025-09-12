@@ -2,7 +2,7 @@
   "name": "CREW",
   "short_name": "CREW",
   "description": "協力会社 出勤簿",
-  "start_url": "/",
+  "start_url": "/kiosk",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
