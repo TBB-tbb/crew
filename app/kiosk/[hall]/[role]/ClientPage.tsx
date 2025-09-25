@@ -7,7 +7,7 @@ import {
   collection,
   getDocs,
   limit,
-  orderBy,
+  orderBy,doc,
   query,
   serverTimestamp,
   Timestamp,
@@ -302,30 +302,78 @@ export default function MemberStep() {
         {(hall === "HallA" ? "ホールA" : "ホールB") + "／" + roleLabel(role)}
       </h1>
 
-      {isOpen ? (
-        <>
-          <p className="mb-5 text-lg text-emerald-600">
-            出勤中　開始 {dayjs(openEntry!.checkIn.toDate()).format("HH:mm")}／
-            {openEntry!.memberNames.join("、")}
-          </p>
-          <div className="mt-2 flex gap-4 flex-col">
+{isOpen ? (
+  <>
+    <p className="mb-5 text-lg text-gray-100">
+      出勤中 {dayjs(openEntry!.checkIn.toDate()).format("HH:mm")}／
+      {openEntry!.memberNames.join("、")}
+    </p>
+
+        {/* 退勤ボタン */}
+    <div className="flex flex-col gap-4">
+      <button
+        onClick={handleCheckOut}
+        disabled={loading}
+        className="rounded-2xl bg-sky-500 w-full px-6 py-10 text-white shadow"
+      >
+        退勤
+      </button>
+      <a href="/kiosk" className="rounded-2xl w-full text-center border px-6 py-4 shadow-sm">
+        トップへ
+      </a>
+    </div>
+
+    {/* 出勤メンバー修正フォーム */}
+    <div className="mt-16">
+      <h2 className="mb-2 text-lg font-bold">出勤メンバーを修正</h2>
+      <div className="grid grid-cols-2 gap-3">
+        {members.map((m) => {
+          const checked = includesByNormalized(openEntry!.memberNames, m.name);
+          return (
             <button
-              onClick={handleCheckOut}
-              disabled={loading}
-              data-sfx="off"
-              className="rounded-2xl bg-sky-500 w-full px-6 py-10 text-white shadow active:scale-[0.98] disabled:opacity-50"
+              key={m.id}
+              onClick={() => {
+                const exists = includesByNormalized(openEntry!.memberNames, m.name);
+                let newList = exists
+                  ? openEntry!.memberNames.filter((n) => normalizeName(n) !== normalizeName(m.name))
+                  : [...openEntry!.memberNames, m.name];
+                setOpenEntry({ ...openEntry!, memberNames: newList });
+              }}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 ${
+                checked ? "bg-sky-500 text-white" : "bg-gray-600 text-white"
+              }`}
             >
-              退勤
+              <span>{checked ? "✓" : ""}</span>
+              {m.name}
             </button>
-            <a
-              href="/kiosk"
-              className="rounded-2xl w-full text-center border px-6 py-4 shadow-sm active:scale-[0.98]"
-            >
-              トップへ
-            </a>
-          </div>
-        </>
-      ) : (
+          );
+        })}
+      </div>
+      <button
+        onClick={async () => {
+          if (!openEntry) return;
+
+          // ★ここに追加！
+          const payload = {
+            memberNames: openEntry.memberNames,
+            status: "IN_PROGRESS",      // ← 忘れず追加
+            updatedAt: serverTimestamp(),
+          };
+          console.log("update payload", payload);
+
+          await updateDoc(doc(db, "entries", openEntry.id), payload);
+
+          alert("出勤メンバーを更新しました！");
+        }}
+        className="mt-4 w-full rounded-xl bg-orange-500 px-4 py-3 text-white shadow"
+      >
+        更新する
+      </button>
+    </div>
+
+
+  </>
+) : (
         <>
           <p className="mb-4 text-base text-neutral-100">
             発注人数以外（研修等）は数にカウントしないでください。
