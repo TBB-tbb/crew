@@ -6,3 +6,12 @@ export const roleLabel = (r: "AUDIO" | "LIGHTING" | "VIDEO") =>
     LIGHTING: "照明",
     VIDEO: "映像",
   }[r]);
+
+
+  export const getShiftDate = (clockInTime: Date) => {
+  const d = dayjs(clockInTime);
+  if (d.hour() >= 22) {
+    return d.add(1, "day").format("YYYY-MM-DD");
+  }
+  return d.format("YYYY-MM-DD");
+};

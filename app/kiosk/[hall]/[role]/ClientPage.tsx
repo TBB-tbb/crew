@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
+import { getShiftDate } from "@/lib/utils";
 import {
   addDoc,
   collection,
@@ -182,55 +183,56 @@ export default function MemberStep() {
     }
   };
 
-  const handleCheckIn = async () => {
-    setLoading(true);
-    setMessage(null);
-    try {
-      await fetchOpen();
-      if (openEntry) {
-        setMessage("この役割は既に出勤中です。退勤してください。");
-        return;
-      }
-
-      const names = dedupeByNormalized([...selected, ...freeList]);
-      if (names.length === 0) {
-        setMessage("メンバーを1名以上選択・追加してください");
-        return;
-      }
-
-      await persistNewMembers(freeList);
-
-      await addDoc(collection(db, "entries"), {
-        hall,
-        role,
-        memberNames: names,
-        date: today,
-        checkIn: Timestamp.now(),
-        status: "IN_PROGRESS",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-
-      // ★ ポップアップを表示（現在時刻とメンバー）
-      setDoneModal({
-        open: true,
-        names,
-        time: dayjs().format("HH:mm"),
-        mode: "in",
-      });
-    } catch (e: any) {
-      setMessage(`エラー: ${e.message ?? e}`);
-    } finally {
-      setLoading(false);
+const handleCheckIn = async () => {
+  setLoading(true);
+  setMessage(null);
+  try {
+    await fetchOpen();
+    if (openEntry) {
+      setMessage("退勤してください。");
+      return;
     }
-    try {
-      if (inSfxRef.current) {
-        inSfxRef.current.currentTime = 0;
-        void inSfxRef.current.play();
-      }
-    } catch {}
-  };
 
+    const names = dedupeByNormalized([...selected, ...freeList]);
+    if (names.length === 0) {
+      setMessage("メンバーを1名以上選択・追加してください");
+      return;
+    }
+
+    await persistNewMembers(freeList);
+
+    const now = new Date();
+    const shiftDate = getShiftDate(now);  // ★ここで補正
+
+    await addDoc(collection(db, "entries"), {
+      hall,
+      role,
+      memberNames: names,
+      date: shiftDate,  // ← 置き換え！
+      checkIn: Timestamp.fromDate(now),
+      status: "IN_PROGRESS",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    setDoneModal({
+      open: true,
+      names,
+      time: dayjs(now).format("HH:mm"),
+      mode: "in",
+    });
+  } catch (e: any) {
+    setMessage(`エラー: ${e.message ?? e}`);
+  } finally {
+    setLoading(false);
+  }
+  try {
+    if (inSfxRef.current) {
+      inSfxRef.current.currentTime = 0;
+      void inSfxRef.current.play();
+    }
+  } catch {}
+};
   const handleCheckOut = async () => {
     setLoading(true);
     setMessage(null);
