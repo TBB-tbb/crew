@@ -31,10 +31,8 @@ export default function KioskTop() {
   }, []);
 
   const fetchStatus = async () => {
-    const today = dayjs().format("YYYY-MM-DD");
     const q = query(
       collection(db, "entries"),
-      where("date", "==", today),
       where("status", "==", "IN_PROGRESS"),
       orderBy("hall")
     );
