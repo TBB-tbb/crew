@@ -471,7 +471,7 @@ const handleTimeUpdateConfirm = async () => {
                   const newH = (Number(h || dayjs(openEntry.checkIn.toDate()).hour()) + 23) % 24;
                   setNewTimeValue(`${String(newH).padStart(2, "0")}:${m || "00"}`);
                 }}
-                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg min-w-[42px]"
               >
                 −
               </button>
@@ -481,7 +481,7 @@ const handleTimeUpdateConfirm = async () => {
                   const newH = (Number(h || dayjs(openEntry.checkIn.toDate()).hour()) + 1) % 24;
                   setNewTimeValue(`${String(newH).padStart(2, "0")}:${m || "00"}`);
                 }}
-                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg min-w-[42px]"
               >
                 ＋
               </button>
@@ -516,7 +516,7 @@ const handleTimeUpdateConfirm = async () => {
                     60;
                   setNewTimeValue(`${h || "00"}:${String(newM).padStart(2, "0")}`);
                 }}
-                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg min-w-[42px]"
               >
                 −
               </button>
@@ -528,7 +528,7 @@ const handleTimeUpdateConfirm = async () => {
                     60;
                   setNewTimeValue(`${h || "00"}:${String(newM).padStart(2, "0")}`);
                 }}
-                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg min-w-[42px]"
               >
                 ＋
               </button>
