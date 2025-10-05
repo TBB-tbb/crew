@@ -359,6 +359,22 @@ const handleTimeUpdateConfirm = async () => {
       出勤中 {dayjs(openEntry!.checkIn.toDate()).format("HH:mm")}／
       {openEntry!.memberNames.join("、")}
     </p>
+{/* 🏠 左上固定ホームボタン */}
+<a
+  href="/kiosk"
+  className="fixed top-4 left-4 z-50 flex items-center gap-2 backdrop-blur-sm border border-white/30 px-3 py-2 text-white shadow-md hover:bg-white/30 transition"
+>
+    <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className="w-6 h-6"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+  </svg>
+</a>
 
         {/* 退勤ボタン */}
     <div className="flex flex-col gap-4">
@@ -369,9 +385,7 @@ const handleTimeUpdateConfirm = async () => {
       >
         退勤
       </button>
-      <a href="/kiosk" className="rounded-2xl w-full text-center border px-6 py-4 shadow-sm">
-        トップへ
-      </a>
+
     </div>
 
     {/* 出勤メンバー修正フォーム */}
@@ -433,56 +447,113 @@ const handleTimeUpdateConfirm = async () => {
 {showTimePopup && (
   <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
     <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-gray-700">
-      <h2 className="mb-4 text-lg font-bold text-gray-600 text-center">
+      <h2 className="mb-5 text-lg font-bold text-gray-700 text-center">
         出勤時刻を修正
       </h2>
 
-      {/* 時刻ピッカー */}
+      {/* 🕓 時刻ディスプレイ */}
       <div className="flex flex-col items-center mb-6">
-        <div className="text-4xl font-bold text-gray-800 mb-4">
-          {dayjs(openEntry?.checkIn?.toDate())
-            .hour(Number(newTimeValue.split(':')[0]) || dayjs(openEntry?.checkIn?.toDate()).hour())
-            .minute(Number(newTimeValue.split(':')[1]) || dayjs(openEntry?.checkIn?.toDate()).minute())
-            .format("HH:mm")}
+        <div className="text-5xl font-bold text-gray-800 mb-4">
+          {newTimeValue
+            ? newTimeValue
+            : dayjs(openEntry?.checkIn?.toDate()).format("HH:mm")}
         </div>
 
-        <div className="flex justify-center gap-6">
+        {/* 🔢 時・分の調整UI */}
+        <div className="flex justify-center gap-10">
+          {/* 時間調整 */}
           <div className="flex flex-col items-center">
-            <label className="text-xs text-gray-500 mb-1">時</label>
+            <span className="text-xs text-gray-500 mb-2">時</span>
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                onClick={() => {
+                  const [h, m] = newTimeValue.split(":");
+                  const newH = (Number(h || dayjs(openEntry.checkIn.toDate()).hour()) + 23) % 24;
+                  setNewTimeValue(`${String(newH).padStart(2, "0")}:${m || "00"}`);
+                }}
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+              >
+                −
+              </button>
+              <button
+                onClick={() => {
+                  const [h, m] = newTimeValue.split(":");
+                  const newH = (Number(h || dayjs(openEntry.checkIn.toDate()).hour()) + 1) % 24;
+                  setNewTimeValue(`${String(newH).padStart(2, "0")}:${m || "00"}`);
+                }}
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+              >
+                ＋
+              </button>
+            </div>
             <input
               type="range"
               min="0"
               max="23"
               step="1"
-              value={Number(newTimeValue.split(':')[0]) || dayjs(openEntry?.checkIn?.toDate()).hour()}
+              value={
+                Number(newTimeValue.split(":")[0]) ||
+                dayjs(openEntry?.checkIn?.toDate()).hour()
+              }
               onChange={(e) => {
                 const h = e.target.value.padStart(2, "0");
                 const [_, m] = newTimeValue.split(":");
                 setNewTimeValue(`${h}:${m || "00"}`);
               }}
-              className="w-32 accent-yellow-500"
+              className="w-28 accent-yellow-500"
             />
           </div>
+
+          {/* 分調整 */}
           <div className="flex flex-col items-center">
-            <label className="text-xs text-gray-500 mb-1">分</label>
+            <span className="text-xs text-gray-500 mb-2">分</span>
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                onClick={() => {
+                  const [h, m] = newTimeValue.split(":");
+                  const newM =
+                    (Number(m || dayjs(openEntry.checkIn.toDate()).minute()) + 59) %
+                    60;
+                  setNewTimeValue(`${h || "00"}:${String(newM).padStart(2, "0")}`);
+                }}
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+              >
+                −
+              </button>
+              <button
+                onClick={() => {
+                  const [h, m] = newTimeValue.split(":");
+                  const newM =
+                    (Number(m || dayjs(openEntry.checkIn.toDate()).minute()) + 1) %
+                    60;
+                  setNewTimeValue(`${h || "00"}:${String(newM).padStart(2, "0")}`);
+                }}
+                className="px-3 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-lg"
+              >
+                ＋
+              </button>
+            </div>
             <input
               type="range"
               min="0"
               max="59"
               step="1"
-              value={Number(newTimeValue.split(':')[1]) || dayjs(openEntry?.checkIn?.toDate()).minute()}
+              value={
+                Number(newTimeValue.split(":")[1]) ||
+                dayjs(openEntry?.checkIn?.toDate()).minute()
+              }
               onChange={(e) => {
                 const m = e.target.value.padStart(2, "0");
                 const [h] = newTimeValue.split(":");
                 setNewTimeValue(`${h || "00"}:${m}`);
               }}
-              className="w-32 accent-yellow-500"
+              className="w-28 accent-yellow-500"
             />
           </div>
         </div>
       </div>
 
-      {/* 暗証番号入力 */}
+      {/* 🔐 暗証番号入力 */}
       <label className="block mb-2 text-sm text-gray-500">暗証番号</label>
       <input
         type="password"
@@ -517,6 +588,7 @@ const handleTimeUpdateConfirm = async () => {
     </div>
   </div>
 )}
+
 
 
   </>
