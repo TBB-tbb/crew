@@ -433,16 +433,56 @@ const handleTimeUpdateConfirm = async () => {
 {showTimePopup && (
   <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
     <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-gray-700">
-      <h2 className="mb-4 text-lg font-bold text-gray-600">出勤時刻を修正</h2>
+      <h2 className="mb-4 text-lg font-bold text-gray-600 text-center">
+        出勤時刻を修正
+      </h2>
 
-      <label className="block mb-2 text-sm text-gray-500">新しい時刻</label>
-      <input
-        type="time"
-        value={newTimeValue}
-        onChange={(e) => setNewTimeValue(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 p-2 mb-4"
-      />
+      {/* 時刻ピッカー */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="text-4xl font-bold text-gray-800 mb-4">
+          {dayjs(openEntry?.checkIn?.toDate())
+            .hour(Number(newTimeValue.split(':')[0]) || dayjs(openEntry?.checkIn?.toDate()).hour())
+            .minute(Number(newTimeValue.split(':')[1]) || dayjs(openEntry?.checkIn?.toDate()).minute())
+            .format("HH:mm")}
+        </div>
 
+        <div className="flex justify-center gap-6">
+          <div className="flex flex-col items-center">
+            <label className="text-xs text-gray-500 mb-1">時</label>
+            <input
+              type="range"
+              min="0"
+              max="23"
+              step="1"
+              value={Number(newTimeValue.split(':')[0]) || dayjs(openEntry?.checkIn?.toDate()).hour()}
+              onChange={(e) => {
+                const h = e.target.value.padStart(2, "0");
+                const [_, m] = newTimeValue.split(":");
+                setNewTimeValue(`${h}:${m || "00"}`);
+              }}
+              className="w-32 accent-yellow-500"
+            />
+          </div>
+          <div className="flex flex-col items-center">
+            <label className="text-xs text-gray-500 mb-1">分</label>
+            <input
+              type="range"
+              min="0"
+              max="59"
+              step="1"
+              value={Number(newTimeValue.split(':')[1]) || dayjs(openEntry?.checkIn?.toDate()).minute()}
+              onChange={(e) => {
+                const m = e.target.value.padStart(2, "0");
+                const [h] = newTimeValue.split(":");
+                setNewTimeValue(`${h || "00"}:${m}`);
+              }}
+              className="w-32 accent-yellow-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 暗証番号入力 */}
       <label className="block mb-2 text-sm text-gray-500">暗証番号</label>
       <input
         type="password"
@@ -453,7 +493,7 @@ const handleTimeUpdateConfirm = async () => {
         maxLength={4}
       />
       {pinError && (
-        <p className="text-red-500 text-sm mb-2">{pinError}</p>
+        <p className="text-red-500 text-sm mb-3">{pinError}</p>
       )}
 
       <div className="flex justify-end gap-3">
