@@ -230,6 +230,53 @@ export default function MemberStep() {
       }
     } catch {}
   };
+  
+const [showTimePopup, setShowTimePopup] = useState(false);
+const [newTimeValue, setNewTimeValue] = useState("");
+const [pin, setPin] = useState("");
+const [pinError, setPinError] = useState("");
+const handleTimeFix = () => {
+  if (!openEntry) return;
+  setNewTimeValue(dayjs(openEntry.checkIn.toDate()).format("HH:mm"));
+  setShowTimePopup(true);
+};
+
+
+const handleTimeUpdateConfirm = async () => {
+  if (!openEntry || !newTimeValue) return;
+
+  // ✅ PINチェック（ここで任意の暗証番号を設定）
+  const correctPin = "1103"; // ← ここを管理者暗証番号にする
+  if (pin !== correctPin) {
+    setPinError("暗証番号が正しくありません。");
+    return;
+  }
+
+  try {
+    const [h, m] = newTimeValue.split(":");
+    const newCheckIn = dayjs(openEntry.checkIn.toDate())
+      .hour(Number(h))
+      .minute(Number(m))
+      .second(0)
+      .toDate();
+
+    await updateDoc(doc(db, "entries", openEntry.id), {
+      checkIn: Timestamp.fromDate(newCheckIn),
+      updatedAt: serverTimestamp(),
+      status: "IN_PROGRESS",
+    });
+
+    setShowTimePopup(false);
+    setPin("");
+    setPinError("");
+    fetchOpen();
+    alert("出勤時間を更新しました！");
+  } catch (e: any) {
+    alert("エラー: " + e.message);
+  }
+};
+
+
 
   const handleCheckOut = async () => {
     setLoading(true);
@@ -370,6 +417,62 @@ export default function MemberStep() {
         更新する
       </button>
     </div>
+{/* 出勤時間修正ボタン */}
+<button
+  onClick={handleTimeFix}
+  className="mb-4 mt-5 w-full rounded-xl bg-yellow-500 px-4 py-3 text-white shadow hover:opacity-90"
+>
+  出勤時間を修正する
+</button>
+
+{/* ポップアップUI（暗証番号付き） */}
+{showTimePopup && (
+  <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
+    <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl text-gray-700">
+      <h2 className="mb-4 text-lg font-bold text-gray-600">出勤時刻を修正</h2>
+
+      <label className="block mb-2 text-sm text-gray-500">新しい時刻</label>
+      <input
+        type="time"
+        value={newTimeValue}
+        onChange={(e) => setNewTimeValue(e.target.value)}
+        className="w-full rounded-lg border border-gray-300 p-2 mb-4"
+      />
+
+      <label className="block mb-2 text-sm text-gray-500">暗証番号</label>
+      <input
+        type="password"
+        value={pin}
+        onChange={(e) => setPin(e.target.value)}
+        className="w-full rounded-lg border border-gray-300 p-2 mb-1"
+        placeholder="4桁の数字"
+        maxLength={4}
+      />
+      {pinError && (
+        <p className="text-red-500 text-sm mb-2">{pinError}</p>
+      )}
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => {
+            setShowTimePopup(false);
+            setPin("");
+            setPinError("");
+          }}
+          className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
+        >
+          キャンセル
+        </button>
+        <button
+          onClick={handleTimeUpdateConfirm}
+          className="px-4 py-2 rounded-lg bg-yellow-500 text-white hover:opacity-90"
+        >
+          更新
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 
   </>
@@ -552,6 +655,7 @@ export default function MemberStep() {
               >
                 トップへ戻る
               </button>
+
             </div>
           </div>
         </div>
