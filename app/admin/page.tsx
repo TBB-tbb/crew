@@ -31,7 +31,7 @@ type EntryDoc = {
 };
 
 const roleLabel = (r: Role) =>
-  ({ AUDIO: "音響", LIGHTING: "照明", VIDEO: "映像" }[r]);
+  ({ AUDIO: "音響", LIGHTING: "照明", VIDEO: "映像" })[r];
 
 export default function AdminPage() {
   const [yyyymm, setYyyymm] = useState(dayjs().format("YYYY-MM"));
@@ -49,7 +49,7 @@ export default function AdminPage() {
     return {
       startStr: start.format("YYYY-MM-DD"),
       endStr: end.format("YYYY-MM-DD"),
-      title: start.format("YYYY年M月"),
+      title: start.format("YYYY年MM月"),
     };
   }, [yyyymm]);
 
@@ -60,7 +60,7 @@ export default function AdminPage() {
         collection(db, "entries"),
         where("date", ">=", monthRange.startStr),
         where("date", "<=", monthRange.endStr),
-        orderBy("date")
+        orderBy("date"),
       );
 
       const snap = await getDocs(q);
@@ -69,7 +69,7 @@ export default function AdminPage() {
           ({
             id: d.id,
             ...d.data(),
-          } as EntryDoc)
+          }) as EntryDoc,
       );
 
       // フィルタ
@@ -95,7 +95,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [yyyymm, hallFilter, roleFilter]);
 
   // 保存処理
   const saveEdit = async () => {
@@ -132,8 +132,7 @@ export default function AdminPage() {
       return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     };
 
-    const fmt = (d?: Date | null) =>
-      d ? dayjs(d).format("HH:mm") : "";
+    const fmt = (d?: Date | null) => (d ? dayjs(d).format("HH:mm") : "");
 
     const lines = rows.map((r) =>
       [
@@ -148,7 +147,7 @@ export default function AdminPage() {
         r.memo ?? "", // ★ 追加
       ]
         .map(escape)
-        .join(",")
+        .join(","),
     );
 
     const csv = "\uFEFF" + [header.join(","), ...lines].join("\r\n");
@@ -164,9 +163,7 @@ export default function AdminPage() {
     URL.revokeObjectURL(url);
   };
 
-  const totalMinutes = rows.reduce(
-    (s, r) => s + (r.minutes ?? 0), 0
-  );
+  const totalMinutes = rows.reduce((s, r) => s + (r.minutes ?? 0), 0);
 
   return (
     <div className="mx-auto max-w-6xl p-6">
@@ -241,20 +238,20 @@ export default function AdminPage() {
       {/* ========= テーブル ========= */}
       <div className="overflow-x-auto rounded-xl border">
         <table className="min-w-full text-sm">
-<thead className="bg-neutral-50">
-  <tr className="text-left text-gray-600">
-    <th className="px-3 py-2">日付</th>
-    <th className="px-3 py-2">ホール</th>
-    <th className="px-3 py-2">役割</th>
-    <th className="px-3 py-2">メンバー</th>
-    <th className="px-3 py-2">開始</th>
-    <th className="px-3 py-2">退勤</th>
-    <th className="px-3 py-2">人数</th>
-    <th className="px-3 py-2">状態</th>
-    <th className="px-3 py-2">メモ</th>
-    <th className="px-3 py-2">操作</th>
-  </tr>
-</thead>
+          <thead className="bg-neutral-50">
+            <tr className="text-left text-gray-600">
+              <th className="px-3 py-2">日付</th>
+              <th className="px-3 py-2">ホール</th>
+              <th className="px-3 py-2">役割</th>
+              <th className="px-3 py-2">メンバー</th>
+              <th className="px-3 py-2">開始</th>
+              <th className="px-3 py-2">退勤</th>
+              <th className="px-3 py-2">人数</th>
+              <th className="px-3 py-2">状態</th>
+              <th className="px-3 py-2">メモ</th>
+              <th className="px-3 py-2">操作</th>
+            </tr>
+          </thead>
 
           <tbody>
             {rows.map((r) => (
@@ -264,18 +261,14 @@ export default function AdminPage() {
                   {r.hall === "HallA" ? "ホールA" : "ホールB"}
                 </td>
                 <td className="px-3 py-2">{roleLabel(r.role)}</td>
-                <td className="px-3 py-2">
-                  {r.memberNames.join("、")}
-                </td>
+                <td className="px-3 py-2">{r.memberNames.join("、")}</td>
                 <td className="px-3 py-2">
                   {r.checkIn ? dayjs(r.checkIn).format("HH:mm") : ""}
                 </td>
                 <td className="px-3 py-2">
                   {r.checkOut ? dayjs(r.checkOut).format("HH:mm") : ""}
                 </td>
-                <td className="px-3 py-2">
-                  {new Set(r.memberNames).size}
-                </td>
+                <td className="px-3 py-2">{new Set(r.memberNames).size}</td>
                 <td className="px-3 py-2">
                   {r.status === "DONE" ? "退勤済" : "出勤中"}
                 </td>
@@ -311,9 +304,7 @@ export default function AdminPage() {
       {editing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white text-black p-6 rounded-xl w-[90%] max-w-lg">
-            <h2 className="text-xl font-bold mb-4">
-              編集（{editing.date}）
-            </h2>
+            <h2 className="text-xl font-bold mb-4">編集（{editing.date}）</h2>
 
             {/* メンバー */}
             <label className="block mb-4">
@@ -341,9 +332,7 @@ export default function AdminPage() {
               <input
                 type="time"
                 value={
-                  editing.checkIn
-                    ? dayjs(editing.checkIn).format("HH:mm")
-                    : ""
+                  editing.checkIn ? dayjs(editing.checkIn).format("HH:mm") : ""
                 }
                 onChange={(e) =>
                   setEditing({
